@@ -42,7 +42,7 @@
 ```bash
 # 1. Get the project
 git clone https://github.com/bLACKtERMINAL737/Mac-Emulator.git
-cd mac-emulator
+cd Mac-Emulator
 
 # 2. One-time setup (downloads a few GB, takes a while)
 chmod +x mac-emulator.sh
@@ -208,7 +208,7 @@ No. It only uses the command-line tools. If you already have Android Studio, Mac
 ## 📁 Project layout
 
 ```
-mac-emulator/
+Mac-Emulator/
 ├── mac-emulator.sh        # the whole tool
 ├── assets/
 │   ├── banner.svg    # README banner
