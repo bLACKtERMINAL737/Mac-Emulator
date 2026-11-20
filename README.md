@@ -41,7 +41,7 @@
 
 ```bash
 # 1. Get the project
-git clone https://github.com/YOUR_USERNAME/mac-emulator.git
+git clone https://github.com/bLACKtERMINAL737/Mac-Emulator.git
 cd mac-emulator
 
 # 2. One-time setup (downloads a few GB, takes a while)
