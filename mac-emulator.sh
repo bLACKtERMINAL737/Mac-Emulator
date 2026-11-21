@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Mac Emulator - run Android apps (APKs) on your Mac with the official Android Emulator.
-# https://github.com/YOUR_USERNAME/mac-emulator
+# https://github.com/bLACKtERMINAL737/Mac-Emulator
 #
 # Run with no arguments (or "help") to see all commands.
 
@@ -22,6 +22,7 @@ AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
 ADB="$ANDROID_HOME/platform-tools/adb"
 EMULATOR="$ANDROID_HOME/emulator/emulator"
 AAPT2="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt2"
+SELF="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
 LOG="/tmp/${AVD_NAME}.log"
 LAST_PKG=""
 
@@ -47,6 +48,8 @@ Commands:
   list                List installed third-party apps
   tune [profile]      Re-tune CPU/RAM/screen: light | balanced | performance
   screenshot          Save a screenshot of the emulator to your Desktop
+  app                 Install "Mac Emulator.app" (double-click to launch, Dock-friendly)
+  dmg                 Build Mac-Emulator.dmg on your Desktop
   doctor              Check your setup and print diagnostics
   stop                Shut the emulator down
   delete              Delete the virtual phone (frees disk space)
@@ -331,6 +334,72 @@ screenshot() {
   ok "Saved: $out"
 }
 
+# ---------- Mac app and DMG --------------------------------------------------
+
+build_app() {
+  local dest="$1" app="$1/Mac Emulator.app"
+  mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources"
+  cp "$SELF" "$app/Contents/Resources/mac-emulator.sh"
+  chmod +x "$app/Contents/Resources/mac-emulator.sh"
+
+  cat > "$app/Contents/Info.plist" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key><string>Mac Emulator</string>
+  <key>CFBundleDisplayName</key><string>Mac Emulator</string>
+  <key>CFBundleIdentifier</key><string>com.mac-emulator.launcher</string>
+  <key>CFBundleExecutable</key><string>launcher</string>
+  <key>CFBundlePackageType</key><string>APPL</string>
+  <key>CFBundleVersion</key><string>1.0.0</string>
+  <key>CFBundleShortVersionString</key><string>1.0.0</string>
+  <key>LSUIElement</key><true/>
+</dict>
+</plist>
+PLIST
+
+  cat > "$app/Contents/MacOS/launcher" <<'LAUNCH'
+#!/bin/bash
+SCRIPT="$(cd "$(dirname "$0")/../Resources" && pwd)/mac-emulator.sh"
+AVD="${AVD_NAME:-MacEmulator}"
+if [[ ! -d "$HOME/.android/avd/${AVD}.avd" ]]; then
+  # First launch: do the one-time setup in Terminal so you can see progress.
+  osascript -e 'tell application "Terminal" to activate' \
+            -e "tell application \"Terminal\" to do script \"bash '$SCRIPT' setup && bash '$SCRIPT' start\""
+else
+  nohup bash "$SCRIPT" start >/tmp/MacEmulator-app.log 2>&1 &
+fi
+LAUNCH
+  chmod +x "$app/Contents/MacOS/launcher"
+  echo "$app"
+}
+
+make_app() {
+  local dest="${1:-/Applications}"
+  if [[ ! -w "$dest" ]]; then dest="$HOME/Applications"; fi
+  mkdir -p "$dest"
+  local app; app="$(build_app "$dest")"
+  ok "Installed: $app"
+  echo "  Open it from Launchpad or Finder. Drag it to your Dock to keep it there."
+  echo "  First time: right-click it, then Open, if macOS asks for confirmation."
+  open -R "$app" 2>/dev/null || true
+}
+
+make_dmg() {
+  command -v hdiutil >/dev/null 2>&1 || die "hdiutil not found."
+  local tmp out="$HOME/Desktop/Mac-Emulator.dmg"
+  tmp="$(mktemp -d)"
+  build_app "$tmp" >/dev/null
+  ln -s /Applications "$tmp/Applications"
+  rm -f "$out"
+  hdiutil create -volname "Mac Emulator" -srcfolder "$tmp" -ov -format UDZO "$out" >/dev/null
+  rm -rf "$tmp"
+  ok "Created: $out"
+  echo "  Open the DMG and drag 'Mac Emulator' to Applications."
+  echo "  The app sets up everything on first launch (needs Homebrew and about 15 GB free)."
+}
+
 # ---------- doctor -----------------------------------------------------------
 
 doctor() {
@@ -375,6 +444,8 @@ case "$cmd" in
   list)       list_apps ;;
   tune)       tune "${2:-}" ;;
   screenshot) screenshot ;;
+  app)        make_app "${2:-}" ;;
+  dmg)        make_dmg ;;
   doctor)     doctor ;;
   stop)       stop ;;
   delete)     delete_avd ;;
