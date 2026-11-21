@@ -40,17 +40,14 @@
 > **You need:** a Mac, [Homebrew](https://brew.sh), and about **15 GB** of free disk space.
 
 ```bash
-# 1. Get the project
 git clone https://github.com/bLACKtERMINAL737/Mac-Emulator.git
 cd Mac-Emulator
-
-# 2. One-time setup (downloads a few GB, takes a while)
 chmod +x mac-emulator.sh
 ./mac-emulator.sh setup
-
-# 3. Start the phone
 ./mac-emulator.sh start
 ```
+
+`setup` runs once and downloads a few GB, so it takes a while. `start` opens the phone.
 
 A phone window opens with **Google Chrome** and the **Play Store**. Sign in with a Google account and install any app you like.
 
@@ -61,8 +58,6 @@ Want to install an APK file instead?
 ```
 
 > 💡 You can also **drag and drop** an `.apk` onto the emulator window.
-
-> ⚠️ Paste only the commands, **not the `# comments`**. Some Terminal setups treat `(` in a comment as an error.
 
 ---
 
@@ -98,10 +93,12 @@ Mac Emulator is a thin, readable wrapper (about 350 lines of bash) around Google
 CPU cores are always capped at half of your Mac's cores, so macOS stays responsive.
 
 ```bash
-./mac-emulator.sh stop            # the emulator must be stopped before tuning
-./mac-emulator.sh tune light      # or: balanced | performance
+./mac-emulator.sh stop
+./mac-emulator.sh tune light
 ./mac-emulator.sh start
 ```
+
+Use `balanced` or `performance` in place of `light` for the other profiles. The emulator must be stopped before tuning.
 
 ---
 
@@ -208,7 +205,7 @@ No. It only uses the command-line tools. If you already have Android Studio, Mac
 ## 📁 Project layout
 
 ```
-Mac-Emulator/
+mac-emulator/
 ├── mac-emulator.sh        # the whole tool
 ├── assets/
 │   ├── banner.svg    # README banner
@@ -239,4 +236,3 @@ Released under the [MIT License](LICENSE).
 Mac Emulator is an independent community project. It is **not affiliated with or endorsed by Google or Apple**. Android, Google Play and Chrome are trademarks of Google LLC. macOS and Apple Silicon are trademarks of Apple Inc. The script only automates the installation and configuration of Google's own free tools on your machine.
 
 <p align="center"><sub>If Mac Emulator saved you time, a ⭐ on the repo helps others find it.</sub></p>
-# Mac-Emulator

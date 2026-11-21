@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # Mac Emulator - run Android apps (APKs) on your Mac with the official Android Emulator.
-# https://github.com/bLACKtERMINAL737/Mac-Emulator
+# https://github.com/YOUR_USERNAME/mac-emulator
 #
 # Run with no arguments (or "help") to see all commands.
 
@@ -191,7 +191,17 @@ tune() {
 
   cores=$(( ncpu / 2 )); (( cores < 2 )) && cores=2; (( cores > cap )) && cores=$cap
 
-  say "Profile '$p': ${cores} CPU cores, ${ram} MB RAM, ${w}x${h} screen  (your Mac: ${ncpu} cores, ${mem_gb} GB RAM)"
+  # The emulator refuses to start if the phone's storage does not fit on disk.
+  local free_gb data
+  free_gb="$(df -g "$HOME" | awk 'NR==2 {print $4}')"
+  data="8G"
+  if (( free_gb < 14 )); then data="4G"; fi
+  if (( free_gb < 8 )); then
+    data="2G"
+    warn "Only ${free_gb} GB of disk space is free. Free up space or the emulator may not start."
+  fi
+
+  say "Profile '$p': ${cores} CPU cores, ${ram} MB RAM, ${w}x${h} screen, ${data} storage  (your Mac: ${ncpu} cores, ${mem_gb} GB RAM)"
   sed -i '' -E '/^(hw[.]cpu[.]ncore|hw[.]ramSize|vm[.]heapSize|hw[.]lcd[.](width|height|density)|hw[.]gpu[.](enabled|mode)|hw[.]keyboard|disk[.]dataPartition[.]size|fastboot[.]forceColdBoot|fastboot[.]forceFastBoot)=/d' "$cfg"
   {
     echo "hw.cpu.ncore=${cores}"
@@ -203,7 +213,7 @@ tune() {
     echo "hw.gpu.enabled=yes"
     echo "hw.gpu.mode=host"
     echo "hw.keyboard=yes"
-    echo "disk.dataPartition.size=8G"
+    echo "disk.dataPartition.size=${data}"
     echo "fastboot.forceColdBoot=no"
     echo "fastboot.forceFastBoot=yes"
   } >> "$cfg"
