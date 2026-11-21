@@ -61,6 +61,28 @@ Want to install an APK file instead?
 
 ---
 
+## 🖱️ Use it like a normal Mac app
+
+After `setup`, you do not need Terminal to open the phone every time.
+
+```bash
+./mac-emulator.sh app
+```
+
+This installs **Mac Emulator.app** into `/Applications` (or `~/Applications`). Open it from Launchpad or Finder, and drag it to your Dock to keep it there. If macOS asks for confirmation the first time, right-click the app and choose **Open**.
+
+Want an installer to share or keep? Build a DMG:
+
+```bash
+./mac-emulator.sh dmg
+```
+
+You get `Mac-Emulator.dmg` on your Desktop. Open it and drag **Mac Emulator** to Applications. On a new Mac, the app runs the one-time setup the first time you launch it (it needs Homebrew and about 15 GB of free disk space).
+
+**Closing the window:** the phone shuts down, but its state is saved (quick boot), so the next launch resumes where you left off in a few seconds. Saving the state needs some extra free disk space. If you only want to get it out of the way, minimize the window instead of closing it.
+
+---
+
 ## 🧠 How it works
 
 ```mermaid
@@ -113,6 +135,8 @@ Use `balanced` or `performance` in place of `light` for the other profiles. The 
 | `list` | Lists the apps you installed |
 | `tune [profile]` | Re-tunes CPU, RAM and screen (`light`, `balanced`, `performance`) |
 | `screenshot` | Saves a PNG of the phone screen to your Desktop |
+| `app` | Installs `Mac Emulator.app` so you can launch the phone with a double-click |
+| `dmg` | Builds `Mac-Emulator.dmg` on your Desktop (drag-to-Applications installer) |
 | `doctor` | Checks your setup and prints useful diagnostics |
 | `stop` | Shuts the emulator down |
 | `delete` | Deletes the virtual phone and frees disk space |
